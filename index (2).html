@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Nico — Cassino ao Vivo</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --gold: #c9a84c;
+    --gold-light: #e8c97a;
+    --gold-dim: #7a6130;
+    --bg: #0a0a0a;
+    --bg2: #111111;
+    --bg3: #181818;
+    --text: #f0ece0;
+    --muted: #8a8070;
+    --green: #2ecc71;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; overflow-x: hidden; }
+
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.2rem 2rem;
+    background: rgba(10,10,10,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(201,168,76,0.15);
+  }
+  .nav-logo { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 900; color: var(--gold); text-decoration: none; }
+  .nav-cta { background: var(--gold); color: #000; font-weight: 600; font-size: 0.85rem; padding: 0.55rem 1.2rem; border-radius: 6px; text-decoration: none; transition: background 0.2s; }
+  .nav-cta:hover { background: var(--gold-light); }
+
+  #hero { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 8rem 1.5rem 5rem; position: relative; overflow: hidden; }
+  #hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(201,168,76,0.08) 0%, transparent 70%); pointer-events: none; }
+  .hero-badge { display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(201,168,76,0.1); border: 1px solid rgba(201,168,76,0.3); border-radius: 50px; padding: 0.4rem 1rem; font-size: 0.78rem; color: var(--gold-light); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 2rem; animation: fadeUp 0.6s ease both; }
+  #hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(2.6rem, 7vw, 5.5rem); font-weight: 900; line-height: 1.1; max-width: 800px; animation: fadeUp 0.7s 0.1s ease both; }
+  #hero h1 em { font-style: italic; color: var(--gold); display: block; }
+  .hero-sub { font-size: clamp(1rem, 2vw, 1.15rem); color: var(--muted); max-width: 560px; line-height: 1.7; margin: 1.8rem auto 2.4rem; animation: fadeUp 0.7s 0.2s ease both; }
+  .hero-sub strong { color: var(--text); }
+  .btn-primary { display: inline-flex; align-items: center; gap: 0.5rem; background: var(--gold); color: #000; font-weight: 700; font-size: 1rem; padding: 0.95rem 2rem; border-radius: 8px; text-decoration: none; transition: transform 0.2s, background 0.2s, box-shadow 0.2s; animation: fadeUp 0.7s 0.3s ease both; box-shadow: 0 0 32px rgba(201,168,76,0.25); }
+  .btn-primary:hover { background: var(--gold-light); transform: translateY(-2px); box-shadow: 0 0 48px rgba(201,168,76,0.4); }
+  .hero-note { font-size: 0.78rem; color: var(--muted); margin-top: 0.9rem; animation: fadeUp 0.7s 0.35s ease both; }
+  .stats-row { display: flex; flex-wrap: wrap; gap: 2rem; justify-content: center; margin-top: 4rem; animation: fadeUp 0.7s 0.4s ease both; }
+  .stat { text-align: center; border-left: 2px solid var(--gold-dim); padding-left: 1.4rem; }
+  .stat-num { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 900; color: var(--gold); display: block; }
+  .stat-label { font-size: 0.75rem; color: var(--muted); line-height: 1.4; max-width: 120px; }
+
+  section { padding: 6rem 1.5rem; }
+  .container { max-width: 1100px; margin: 0 auto; }
+  .section-tag { font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.8rem; }
+  h2 { font-family: 'Playfair Display', serif; font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 900; line-height: 1.15; margin-bottom: 1rem; }
+  h2 em { font-style: italic; color: var(--gold); }
+
+  #results { background: var(--bg2); }
+  .big-number { font-family: 'Playfair Display', serif; font-size: clamp(3rem, 8vw, 5rem); font-weight: 900; color: var(--gold); line-height: 1; margin: 2rem 0 0.5rem; }
+  .big-desc { color: var(--muted); font-size: 1rem; line-height: 1.6; max-width: 440px; }
+  .tick { color: var(--green); margin-right: 0.3rem; }
+  .see-link { display: inline-flex; align-items: center; gap: 0.4rem; color: var(--gold); font-weight: 600; text-decoration: none; margin-top: 1.2rem; font-size: 0.95rem; border-bottom: 1px solid transparent; transition: border-color 0.2s; }
+  .see-link:hover { border-color: var(--gold); }
+
+  .proof-grid { display: flex; gap: 1rem; overflow-x: auto; padding-bottom: 1rem; margin-top: 3rem; scrollbar-width: thin; scrollbar-color: var(--gold-dim) transparent; }
+  .proof-card { flex: 0 0 220px; border-radius: 12px; overflow: hidden; border: 1px solid rgba(201,168,76,0.15); position: relative; background: var(--bg3); }
+  .proof-card img { width: 100%; height: 280px; object-fit: cover; display: block; }
+  .proof-tag { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(0,0,0,0.85), transparent); padding: 1rem 0.75rem 0.75rem; }
+  .proof-tag .label { color: var(--green); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; }
+  .proof-tag .value { color: var(--gold-light); font-weight: 700; font-size: 1rem; }
+
+  #about .container { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
+  @media(max-width: 768px) { #about .container { grid-template-columns: 1fr; } }
+  .about-img-wrap { border-radius: 16px; overflow: hidden; border: 1px solid rgba(201,168,76,0.2); aspect-ratio: 3/4; max-height: 480px; }
+  .about-img-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .about-text p { color: var(--muted); line-height: 1.75; margin-bottom: 1rem; }
+  .about-text p strong { color: var(--text); }
+
+  #community { background: var(--bg2); }
+  .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-bottom: 4rem; }
+  .feature-card { background: var(--bg3); border: 1px solid rgba(201,168,76,0.1); border-radius: 12px; padding: 1.8rem 1.5rem; transition: border-color 0.2s, transform 0.2s; }
+  .feature-card:hover { border-color: rgba(201,168,76,0.35); transform: translateY(-3px); }
+  .feature-icon { font-size: 1.8rem; margin-bottom: 0.8rem; }
+  .feature-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; color: var(--text); margin-bottom: 0.5rem; }
+  .feature-desc { font-size: 0.88rem; color: var(--muted); line-height: 1.6; }
+  .cta-block { text-align: center; border: 1px solid rgba(201,168,76,0.2); border-radius: 16px; padding: 3rem 2rem; background: linear-gradient(135deg, rgba(201,168,76,0.05) 0%, transparent 60%); }
+  .cta-block h3 { font-family: 'Playfair Display', serif; font-size: clamp(1.8rem, 4vw, 2.5rem); font-weight: 900; margin-bottom: 0.8rem; }
+  .cta-block p { color: var(--muted); margin-bottom: 2rem; }
+
+  .test-scroll { display: flex; gap: 1rem; overflow-x: auto; padding-bottom: 1rem; margin-top: 2.5rem; scrollbar-width: thin; scrollbar-color: var(--gold-dim) transparent; }
+  .test-card { flex: 0 0 260px; border-radius: 12px; overflow: hidden; border: 1px solid rgba(201,168,76,0.15); background: var(--bg3); }
+  .test-card img { width: 100%; display: block; }
+  .scroll-hint { text-align: center; color: var(--muted); font-size: 0.78rem; margin-top: 1rem; }
+
+  footer { border-top: 1px solid rgba(201,168,76,0.1); padding: 2rem 1.5rem; text-align: center; color: var(--muted); font-size: 0.78rem; }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+  .reveal { opacity: 0; transform: translateY(32px); transition: opacity 0.65s ease, transform 0.65s ease; }
+  .reveal.visible { opacity: 1; transform: none; }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="#hero">Nico.</a>
+  <a class="nav-cta" href="https://chat.whatsapp.com/DTqJfYGV53i2A1v2RzD0wq" target="_blank">Entrar grátis →</a>
+</nav>
+
+<section id="hero">
+  <div class="hero-badge"><span>●</span> Roleta ao Vivo · Método Real</div>
+  <h1>Enquanto a maioria<br>perde, eu ensino<br><em>você a ganhar.</em></h1>
+  <p class="hero-sub">Sou <strong>Nico</strong>, especialista em roleta ao vivo. Já ultrapassei <strong>R$800.000 em resultados</strong> — e compartilho meu método gratuitamente com quem quer operar de verdade.</p>
+  <a class="btn-primary" href="https://chat.whatsapp.com/DTqJfYGV53i2A1v2RzD0wq" target="_blank">▶ Entrar na Comunidade Grátis</a>
+  <p class="hero-note">100% gratuito · Sem compromisso</p>
+  <div class="stats-row">
+    <div class="stat"><span class="stat-num">R$800K+</span><span class="stat-label">Em resultados acumulados</span></div>
+    <div class="stat"><span class="stat-num">R$237K</span><span class="stat-label">Sacados em uma plataforma em 2026</span></div>
+    <div class="stat"><span class="stat-num">100%</span><span class="stat-label">Comunidade gratuita</span></div>
+  </div>
+</section>
+
+<section id="results">
+  <div class="container">
+    <div class="reveal">
+      <p class="section-tag">Números reais</p>
+      <h2>Resultados reais.</h2>
+      <p style="color:var(--muted);line-height:1.6;">Total sacado · Uma plataforma · 2026. Comprovado e documentado.</p>
+      <div class="big-number">R$237.000</div>
+      <p class="big-desc">Apenas em uma das plataformas que opero. Esse número representa consistência — não sorte.<br><br><span class="tick">✓</span> Comprovado e documentado</p>
+      <a class="see-link" href="https://chat.whatsapp.com/DTqJfYGV53i2A1v2RzD0wq" target="_blank">Ver como funciona →</a>
+    </div>
+    <div class="proof-grid reveal">
+      <div class="proof-card"><img src="result-72k.jpeg" alt="R$ 72.000" /><div class="proof-tag"><div class="label">Vitória</div><div class="value">R$ 72.000</div></div></div>
+      <div class="proof-card"><img src="result-58k.jpeg" alt="R$ 58.500" /><div class="proof-tag"><div class="label">Vitória</div><div class="value">R$ 58.500</div></div></div>
+      <div class="proof-card"><img src="result-3600.jpeg" alt="R$ 3.600" /><div class="proof-tag"><div class="label">Vitória</div><div class="value">R$ 3.600</div></div></div>
+      <div class="proof-card"><img src="result-1800.jpeg" alt="R$ 1.800" /><div class="proof-tag"><div class="label">Vitória</div><div class="value">R$ 1.800</div></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="about">
+  <div class="container">
+    <div class="about-img-wrap reveal">
+      <img src="about.jpeg" alt="Nico em cassino físico" />
+    </div>
+    <div class="about-text reveal">
+      <p class="section-tag">Quem sou</p>
+      <h2>Não sou teórico.</h2>
+      <p>Opero roleta ao vivo há anos — online e em cassinos físicos. Conheço cada detalhe da operação, da gestão de banca à leitura de mesa.</p>
+      <p>Já ultrapassei <strong>R$800.000 em resultados</strong>, com R$237.000 sacados em apenas uma plataforma em 2026. Não vendo promessas — mostro o caminho com consistência e método.</p>
+      <a class="btn-primary" href="https://chat.whatsapp.com/DTqJfYGV53i2A1v2RzD0wq" target="_blank" style="margin-top:1.5rem;display:inline-flex;">▶ Quero aprender</a>
+    </div>
+  </div>
+</section>
+
+<section id="community">
+  <div class="container">
+    <div class="reveal">
+      <p class="section-tag">Comunidade</p>
+      <h2>Entre de graça.<br><em>Saia com resultado.</em></h2>
+      <p style="color:var(--muted);line-height:1.7;margin-top:0.8rem;">Nada de curso caro ou promessa vazia. A comunidade é gratuita, o método é real.</p>
+    </div>
+    <div class="features-grid reveal">
+      <div class="feature-card"><div class="feature-icon">🎯</div><div class="feature-title">Lives Semanais</div><div class="feature-desc">Entra ao vivo comigo na roleta. Vê a operação em tempo real e aprende na prática.</div></div>
+      <div class="feature-card"><div class="feature-icon">📚</div><div class="feature-title">Conteúdo Educativo</div><div class="feature-desc">Do zero ao avançado. Lógica da roleta, gestão de banca e tomada de decisão.</div></div>
+      <div class="feature-card"><div class="feature-icon">💸</div><div class="feature-title">Sorteios de Pix</div><div class="feature-desc">Membros participam de sorteios exclusivos. Mais um motivo pra entrar agora.</div></div>
+      <div class="feature-card"><div class="feature-icon">🧠</div><div class="feature-title">Método Real</div><div class="feature-desc">Nada de robôs ou sinais aleatórios. O que ensino é o que uso — testado e documentado.</div></div>
+    </div>
+    <div class="cta-block reveal">
+      <h3>Pronto pra virar o jogo?</h3>
+      <p>O grupo é gratuito. A entrada é agora. Só depende de você.</p>
+      <a class="btn-primary" href="https://chat.whatsapp.com/DTqJfYGV53i2A1v2RzD0wq" target="_blank" style="margin:0 auto;">▶ Quero entrar na comunidade agora →</a>
+    </div>
+  </div>
+</section>
+
+<section id="testimonials">
+  <div class="container">
+    <div class="reveal">
+      <p class="section-tag">Prova social</p>
+      <h2>Eles duvidaram.<br><em>Agora agradecem.</em></h2>
+      <p style="color:var(--muted);margin-top:0.5rem;">Prints reais de quem entrou na comunidade e aplicou o método.</p>
+    </div>
+    <div class="test-scroll reveal">
+      <div class="test-card"><img src="dep-1.jpeg" alt="Depoimento 1" /></div>
+      <div class="test-card"><img src="dep-2.jpeg" alt="Depoimento 2" /></div>
+      <div class="test-card"><img src="dep-3.png" alt="Depoimento 3" /></div>
+      <div class="test-card"><img src="dep-4.jpeg" alt="Depoimento 4" /></div>
+      <div class="test-card"><img src="dep-5.jpeg" alt="Depoimento 5" /></div>
+    </div>
+    <p class="scroll-hint reveal">← arraste para ver mais →</p>
+  </div>
+</section>
+
+<footer>
+  <p>© 2026 Nico · Todos os direitos reservados · Jogue com responsabilidade</p>
+</footer>
+
+<script>
+  const els = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
+  }, { threshold: 0.1 });
+  els.forEach(el => io.observe(el));
+
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const t = document.querySelector(a.getAttribute('href'));
+      if (t) { e.preventDefault(); t.scrollIntoView({ behavior: 'smooth' }); }
+    });
+  });
+</script>
+</body>
+</html>
